@@ -20,6 +20,9 @@ while (true)
             MarkTaskComplete(taskManager);
             break;
         case "4":
+            DeleteTask(taskManager);
+            break;
+        case "5":
             return;
         default:
             Console.WriteLine("Invalid option. Please try again.");
@@ -34,7 +37,8 @@ static void ShowMenu()
     Console.WriteLine("1. Add new task");
     Console.WriteLine("2. List all tasks");
     Console.WriteLine("3. Mark task as complete");
-    Console.WriteLine("4. Exit");
+    Console.WriteLine("4. Delete task");
+    Console.WriteLine("5. Exit");
     Console.WriteLine(new string('=', 25));
 }
 
@@ -73,5 +77,33 @@ static void MarkTaskComplete(TaskManager manager)
     else
     {
         Console.WriteLine("Invalid task number.");
+    }
+}
+
+static void DeleteTask(TaskManager manager)
+{
+    var tasks = manager.GetTasks();
+    if (!tasks.Any())
+    {
+        Console.WriteLine("No tasks to delete.");
+        return;
+    }
+
+    ListTasks(manager);
+    Console.Write("Enter task number to delete: ");
+    if (int.TryParse(Console.ReadLine(), out int taskNumber))
+    {
+        if (manager.DeleteTask(taskNumber - 1))
+        {
+            Console.WriteLine("\nTask deleted successfully!");
+        }
+        else
+        {
+            Console.WriteLine("Invalid task number.");
+        }
+    }
+    else
+    {
+        Console.WriteLine("Invalid input. Please enter a valid number.");
     }
 }
