@@ -1,0 +1,120 @@
+@page
+@model TasksManagerWeb.Pages.Tasks.IndexModel
+@{
+    ViewData["Title"] = "Task Manager";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-tasks me-2"></i>Task Manager
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Add New Task Form -->
+                    <div class="mb-4">
+                        <h5>Add New Task</h5>
+                        <form method="post" asp-page-handler="AddTask" class="mb-3">
+                            <div class="input-group">
+                                <input type="text" asp-for="NewTaskDescription" class="form-control" 
+                                       placeholder="Enter task description..." required maxlength="500">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-plus me-1"></i>Add Task
+                                </button>
+                            </div>
+                            <span asp-validation-for="NewTaskDescription" class="text-danger"></span>
+                        </form>
+                    </div>
+
+                    <hr>
+
+                    <!-- Tasks List -->
+                    <div class="mb-3">
+                        <h5>Tasks (@Model.Tasks.Count)</h5>
+                        @if (!Model.Tasks.Any())
+                        {
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-inbox fa-3x mb-3"></i>
+                                <p>No tasks found. Add your first task above!</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="list-group">
+                                @foreach (var task in Model.Tasks)
+                                {
+                                    <div class="list-group-item d-flex justify-content-between align-items-center @(task.IsCompleted ? "list-group-item-light" : "")">
+                                        <div class="d-flex align-items-center">
+                                            <form method="post" asp-page-handler="ToggleComplete" class="me-3">
+                                                <input type="hidden" name="id" value="@task.Id">
+                                                <button type="submit" class="btn btn-sm @(task.IsCompleted ? "btn-success" : "btn-outline-success")" 
+                                                        title="@(task.IsCompleted ? "Mark as incomplete" : "Mark as complete")">
+                                                    <i class="fas @(task.IsCompleted ? "fa-check-square" : "fa-square") fa-lg"></i>
+                                                </button>
+                                            </form>
+                                            <div>
+                                                <span class="@(task.IsCompleted ? "text-decoration-line-through text-muted" : "")">
+                                                    @task.Description
+                                                </span>
+                                                <br>
+                                                <small class="text-muted">
+                                                    Created: @task.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")
+                                                    @if (task.IsCompleted && task.CompletedAt.HasValue)
+                                                    {
+                                                        <text><br />Completed: @task.CompletedAt.Value.ToString("MM/dd/yyyy hh:mm tt")</text>
+                                                    }
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <form method="post" asp-page-handler="DeleteTask" 
+                                              onsubmit="return confirm('Are you sure you want to delete this task?');">
+                                            <input type="hidden" name="id" value="@task.Id">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete task">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div class="toast show" role="alert">
+            <div class="toast-header bg-success text-white">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong class="me-auto">Success</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                @TempData["SuccessMessage"]
+            </div>
+        </div>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div class="toast show" role="alert">
+            <div class="toast-header bg-danger text-white">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <strong class="me-auto">Error</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                @TempData["ErrorMessage"]
+            </div>
+        </div>
+    </div>
+}
